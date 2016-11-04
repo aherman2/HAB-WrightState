@@ -1,0 +1,12 @@
+a = arduino ('COM4','Uno', 'Libraries', 'I2C');
+addrs = scanI2CBus(a);
+tmp102 = i2cdev(a, 'tempsensoradress');
+write(tmp102, 0, 'uint8');
+data = read(tmp102, 2, 'uint8');
+temperature = (double(bitshift(int16(data(1)), 4)) + double(bitshift(int16(data(2)), -4))) * 0.0625
+writeRegister(tmp102, 1, hex2dec('60B0'), 'uint16');
+pause(0.25);
+data = readRegister(tmp102, 0, 'uint16');
+temperature = double(bitshift(bitand(data, hex2dec('FFF8')), -3)) * 0.0625
+writeRegister(tmp102, 1, hex2dec('60A0'), 'uint16');
+clear tmp102 a
